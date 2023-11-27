@@ -2,6 +2,7 @@ package todo
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,6 +18,7 @@ func TestSimple(t *testing.T) {
 	phone.Sync(laptop)
 
 	phone.UpdateText(td1, "read about local-first and crdt")
+	time.Sleep(time.Nanosecond)
 
 	longMsg := "read about local-first, crdt and automerge"
 	laptop.UpdateText(td1, longMsg)

@@ -5,8 +5,7 @@ import (
 )
 
 type ToDo struct {
-	id  operation.DocumentID
-	ops []operation.Operation
+	id operation.DocumentID
 
 	titleLastOp operation.OperationID
 	Title       string
