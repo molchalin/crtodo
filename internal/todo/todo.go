@@ -1,73 +1,48 @@
 package todo
 
 import (
-	"encoding"
-	"fmt"
-	"strconv"
-
 	"github.com/molchalin/crtodo/internal/operation"
 )
 
 type ToDo struct {
-	id   operation.DocumentID
-	Name Field[*str]
-	Done Field[*bol]
+	id  operation.DocumentID
+	ops []operation.Operation
+
+	titleLastOp operation.OperationID
+	Title       string
+	doneLastOp  operation.OperationID
+	Done        bool
 }
 
-func Build(id operation.DocumentID, ops []operation.Operation) (ToDo, error) {
-	td := ToDo{
-		id: id,
+func Build(ops []operation.Operation) *ToDo {
+	td := &ToDo{}
+	if len(ops) == 0 {
+		panic("elements expected")
 	}
 	for _, op := range ops {
-		var err error
+		td.id = op.DocumentID
 		switch op.Field {
-		case "name":
-			err = td.Name.apply(op)
+		case "title":
+			td.Title = op.Value
+			td.titleLastOp = op.ID
 		case "done":
-			err = td.Done.apply(op)
-		}
-		if err != nil {
-			return ToDo{}, fmt.Errorf("apply operation: %v", err)
+			td.Done = op.Value != ""
+			td.doneLastOp = op.ID
 		}
 	}
-	return td, nil
+	return td
 }
 
-type marshaler interface {
-	encoding.TextMarshaler
-	encoding.TextUnmarshaler
+func (t *ToDo) updateText(text string) operation.Operation {
+	op := operation.New(t.id, "title", text, t.titleLastOp)
+	t.Title = text
+	t.titleLastOp = op.ID
+	return op
 }
 
-type Field[T marshaler] struct {
-	Value         T
-	LastOperation operation.OperationID
-}
-
-func (f *Field[T]) apply(op operation.Operation) error {
-	err := f.Value.UnmarshalText([]byte(op.Value))
-	f.LastOperation = op.ID
-	return err
-}
-
-type str string
-
-func (s *str) MarshalText() ([]byte, error) {
-	return []byte(*s), nil
-}
-
-func (s *str) UnmarshalText(b []byte) error {
-	*s = str(b)
-	return nil
-}
-
-type bol bool
-
-func (b *bol) MarshalText() ([]byte, error) {
-	return []byte(strconv.FormatBool(bool(*b))), nil
-}
-
-func (s *bol) UnmarshalText(b []byte) error {
-	v, err := strconv.ParseBool(string(b))
-	*s = bol(v)
-	return err
+func (t *ToDo) done() operation.Operation {
+	op := operation.New(t.id, "done", "true", t.doneLastOp)
+	t.Done = true
+	t.doneLastOp = op.ID
+	return op
 }

@@ -5,6 +5,7 @@ go 1.21.4
 require (
 	github.com/google/uuid v1.4.0
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 )
 
 require (

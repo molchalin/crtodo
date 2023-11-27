@@ -10,31 +10,31 @@ import (
 
 func TestSingle(t *testing.T) {
 	dID := DocumentID(uuid.NewString())
-	opID1 := OperationID("a")
-	opID21 := OperationID("ab")
-	opID22 := OperationID("aa")
-	opID3 := OperationID("aba")
+	opID1 := OperationID(1)
+	opID21 := OperationID(3)
+	opID22 := OperationID(2)
+	opID3 := OperationID(4)
 
 	ops := []Operation{
 		{
 			ID:         opID1,
 			DocumentID: dID,
-			PrevID:     nil,
+			PrevID:     0,
 		},
 		{
 			ID:         opID21,
 			DocumentID: dID,
-			PrevID:     &opID1,
+			PrevID:     opID1,
 		},
 		{
 			ID:         opID22,
 			DocumentID: dID,
-			PrevID:     &opID1,
+			PrevID:     opID1,
 		},
 		{
 			ID:         opID3,
 			DocumentID: dID,
-			PrevID:     &opID21,
+			PrevID:     opID21,
 		},
 	}
 
